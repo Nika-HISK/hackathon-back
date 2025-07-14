@@ -5,7 +5,6 @@ import { Dish } from '../entities/dish.entity';
 import { CreateDishDto } from '../dto/create-dish.dto';
 import { UpdateDishDto } from '../dto/update-dish.dto';
 
-
 @Injectable()
 export class DishRepository {
   constructor(
@@ -46,7 +45,8 @@ export class DishRepository {
   }
 
   async findByPriceRange(minPrice: number, maxPrice: number): Promise<Dish[]> {
-    return await this.dishRepository.createQueryBuilder('dish')
+    return await this.dishRepository
+      .createQueryBuilder('dish')
       .where('dish.price >= :minPrice', { minPrice })
       .andWhere('dish.price <= :maxPrice', { maxPrice })
       .leftJoinAndSelect('dish.restaurant', 'restaurant')
@@ -54,24 +54,30 @@ export class DishRepository {
   }
 
   async findByTags(tags: string[]): Promise<Dish[]> {
-    const query = this.dishRepository.createQueryBuilder('dish')
+    const query = this.dishRepository
+      .createQueryBuilder('dish')
       .leftJoinAndSelect('dish.restaurant', 'restaurant');
-    
+
     tags.forEach((tag, index) => {
-      query.andWhere(`JSON_CONTAINS(dish.tags, :tag${index})`, { [`tag${index}`]: `"${tag}"` });
+      query.andWhere(`JSON_CONTAINS(dish.tags, :tag${index})`, {
+        [`tag${index}`]: `"${tag}"`,
+      });
     });
-    
+
     return await query.getMany();
   }
 
   async findByAllergens(allergens: string[]): Promise<Dish[]> {
-    const query = this.dishRepository.createQueryBuilder('dish')
+    const query = this.dishRepository
+      .createQueryBuilder('dish')
       .leftJoinAndSelect('dish.restaurant', 'restaurant');
-    
+
     allergens.forEach((allergen, index) => {
-      query.andWhere(`NOT JSON_CONTAINS(dish.allergens, :allergen${index})`, { [`allergen${index}`]: `"${allergen}"` });
+      query.andWhere(`NOT JSON_CONTAINS(dish.allergens, :allergen${index})`, {
+        [`allergen${index}`]: `"${allergen}"`,
+      });
     });
-    
+
     return await query.getMany();
   }
 

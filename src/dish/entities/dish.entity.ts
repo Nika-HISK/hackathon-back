@@ -1,8 +1,15 @@
+import { BaseEntity } from 'src/common/baseEntity';
 import { Restaurant } from 'src/restaurant/entities/restaurant.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity('dishes')
-export class Dish {
+export class Dish extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

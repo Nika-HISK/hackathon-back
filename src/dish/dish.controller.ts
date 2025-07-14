@@ -10,14 +10,12 @@ import {
   ParseIntPipe,
   ParseFloatPipe,
   HttpStatus,
-  HttpCode
+  HttpCode,
 } from '@nestjs/common';
 import { DishService } from './dish.service';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { DishResponseDto } from './dto/response-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
-
-
 
 @Controller('dishes')
 export class DishController {
@@ -48,24 +46,32 @@ export class DishController {
   }
 
   @Get('search/tags')
-  async findByTags(@Query('tags') tags: string | string[]): Promise<DishResponseDto[]> {
+  async findByTags(
+    @Query('tags') tags: string | string[],
+  ): Promise<DishResponseDto[]> {
     const tagArray = Array.isArray(tags) ? tags : [tags];
     return await this.dishService.findByTags(tagArray);
   }
 
   @Get('search/allergens')
-  async findByAllergens(@Query('allergens') allergens: string | string[]): Promise<DishResponseDto[]> {
+  async findByAllergens(
+    @Query('allergens') allergens: string | string[],
+  ): Promise<DishResponseDto[]> {
     const allergenArray = Array.isArray(allergens) ? allergens : [allergens];
     return await this.dishService.findByAllergens(allergenArray);
   }
 
   @Get('restaurant/:restaurantId')
-  async findByRestaurantId(@Param('restaurantId', ParseIntPipe) restaurantId: number): Promise<DishResponseDto[]> {
+  async findByRestaurantId(
+    @Param('restaurantId', ParseIntPipe) restaurantId: number,
+  ): Promise<DishResponseDto[]> {
     return await this.dishService.findByRestaurantId(restaurantId);
   }
 
   @Get(':id')
-  async findById(@Param('id', ParseIntPipe) id: number): Promise<DishResponseDto> {
+  async findById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<DishResponseDto> {
     return await this.dishService.findById(id);
   }
 
@@ -85,7 +91,9 @@ export class DishController {
 
   @Delete('restaurant/:restaurantId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteByRestaurantId(@Param('restaurantId', ParseIntPipe) restaurantId: number): Promise<void> {
+  async deleteByRestaurantId(
+    @Param('restaurantId', ParseIntPipe) restaurantId: number,
+  ): Promise<void> {
     await this.dishService.deleteByRestaurantId(restaurantId);
   }
 }

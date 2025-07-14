@@ -1,11 +1,14 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { UserRepository } from 'src/users/repositories/user.repository';
 import { CreateUserPreferencesDto } from './dto/create-preference.dto';
 import { UpdateUserPreferencesDto } from './dto/update-preference.dto';
 import { UserPreferences } from './entities/user-preference.entity';
 import { UserPreferencesRepository } from './repositories/user-preferences.repository';
 import { UserPreferencesResponseDto } from './dto/response-preference';
-
 
 @Injectable()
 export class UserPreferencesService {
@@ -14,19 +17,27 @@ export class UserPreferencesService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async create(createUserPreferencessDto: CreateUserPreferencesDto): Promise<UserPreferencesResponseDto> {
-    const userExists = await this.userRepository.exists(createUserPreferencessDto.userId);
+  async create(
+    createUserPreferencessDto: CreateUserPreferencesDto,
+  ): Promise<UserPreferencesResponseDto> {
+    const userExists = await this.userRepository.exists(
+      createUserPreferencessDto.userId,
+    );
     if (!userExists) {
-      throw new BadRequestException(`User with ID ${createUserPreferencessDto.userId} does not exist`);
+      throw new BadRequestException(
+        `User with ID ${createUserPreferencessDto.userId} does not exist`,
+      );
     }
 
-    const preferences = await this.userPreferencesRepository.create(createUserPreferencessDto);
+    const preferences = await this.userPreferencesRepository.create(
+      createUserPreferencessDto,
+    );
     return this.toResponseDto(preferences);
   }
 
   async findAll(): Promise<UserPreferencesResponseDto[]> {
     const preferences = await this.userPreferencesRepository.findAll();
-    return preferences.map(pref => this.toResponseDto(pref));
+    return preferences.map((pref) => this.toResponseDto(pref));
   }
 
   async findById(id: number): Promise<UserPreferencesResponseDto> {
@@ -43,17 +54,24 @@ export class UserPreferencesService {
       throw new BadRequestException(`User with ID ${userId} does not exist`);
     }
 
-    const preferences = await this.userPreferencesRepository.findByUserId(userId);
-    return preferences.map(pref => this.toResponseDto(pref));
+    const preferences =
+      await this.userPreferencesRepository.findByUserId(userId);
+    return preferences.map((pref) => this.toResponseDto(pref));
   }
 
-  async update(id: number, updateUserPreferencesDto: UpdateUserPreferencesDto): Promise<UserPreferencesResponseDto> {
+  async update(
+    id: number,
+    updateUserPreferencesDto: UpdateUserPreferencesDto,
+  ): Promise<UserPreferencesResponseDto> {
     const preferences = await this.userPreferencesRepository.findById(id);
     if (!preferences) {
       throw new NotFoundException(`User Preferences with ID ${id} not found`);
     }
 
-    const updatedPreferences = await this.userPreferencesRepository.update(id, updateUserPreferencesDto);
+    const updatedPreferences = await this.userPreferencesRepository.update(
+      id,
+      updateUserPreferencesDto,
+    );
     return this.toResponseDto(updatedPreferences);
   }
 
@@ -73,7 +91,9 @@ export class UserPreferencesService {
     await this.userPreferencesRepository.deleteByUserId(userId);
   }
 
-  private toResponseDto(preferences: UserPreferences): UserPreferencesResponseDto {
+  private toResponseDto(
+    preferences: UserPreferences,
+  ): UserPreferencesResponseDto {
     return {
       id: preferences.id,
       userId: preferences.userId,

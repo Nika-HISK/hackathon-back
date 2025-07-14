@@ -1,22 +1,21 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Put, 
-  Delete, 
-  Body, 
-  Param, 
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
   Query,
   ParseIntPipe,
   ParseFloatPipe,
   HttpStatus,
-  HttpCode
+  HttpCode,
 } from '@nestjs/common';
 import { RestaurantService } from './restaurant.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { RestaurantResponseDto } from './dto/response-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
-
 
 @Controller('restaurants')
 export class RestaurantController {
@@ -24,7 +23,9 @@ export class RestaurantController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createRestaurantDto: CreateRestaurantDto): Promise<RestaurantResponseDto> {
+  async create(
+    @Body() createRestaurantDto: CreateRestaurantDto,
+  ): Promise<RestaurantResponseDto> {
     return await this.restaurantService.create(createRestaurantDto);
   }
 
@@ -34,12 +35,16 @@ export class RestaurantController {
   }
 
   @Get('search/name')
-  async findByName(@Query('name') name: string): Promise<RestaurantResponseDto[]> {
+  async findByName(
+    @Query('name') name: string,
+  ): Promise<RestaurantResponseDto[]> {
     return await this.restaurantService.findByName(name);
   }
 
   @Get('search/price-range')
-  async findByPriceRange(@Query('range', ParseIntPipe) priceRange: number): Promise<RestaurantResponseDto[]> {
+  async findByPriceRange(
+    @Query('range', ParseIntPipe) priceRange: number,
+  ): Promise<RestaurantResponseDto[]> {
     return await this.restaurantService.findByPriceRange(priceRange);
   }
 
@@ -49,11 +54,17 @@ export class RestaurantController {
     @Query('longitude', ParseFloatPipe) longitude: number,
     @Query('radius', ParseFloatPipe) radius: number = 1,
   ): Promise<RestaurantResponseDto[]> {
-    return await this.restaurantService.findByLocation(latitude, longitude, radius);
+    return await this.restaurantService.findByLocation(
+      latitude,
+      longitude,
+      radius,
+    );
   }
 
   @Get(':id')
-  async findById(@Param('id', ParseIntPipe) id: number): Promise<RestaurantResponseDto> {
+  async findById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<RestaurantResponseDto> {
     return await this.restaurantService.findById(id);
   }
 

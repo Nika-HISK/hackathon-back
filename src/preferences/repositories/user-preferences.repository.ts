@@ -12,8 +12,12 @@ export class UserPreferencesRepository {
     private readonly userPreferencessRepository: Repository<UserPreferences>,
   ) {}
 
-  async create(createUserPreferencessDto: CreateUserPreferencesDto): Promise<UserPreferences> {
-    const Preferencess = this.userPreferencessRepository.create(createUserPreferencessDto);
+  async create(
+    createUserPreferencessDto: CreateUserPreferencesDto,
+  ): Promise<UserPreferences> {
+    const Preferencess = this.userPreferencessRepository.create(
+      createUserPreferencessDto,
+    );
     return await this.userPreferencessRepository.save(Preferencess);
   }
 
@@ -37,7 +41,10 @@ export class UserPreferencesRepository {
     });
   }
 
-  async update(id: number, UpdateUserPreferencesDto: UpdateUserPreferencesDto): Promise<UserPreferences | null> {
+  async update(
+    id: number,
+    UpdateUserPreferencesDto: UpdateUserPreferencesDto,
+  ): Promise<UserPreferences | null> {
     await this.userPreferencessRepository.update(id, UpdateUserPreferencesDto);
     return await this.findById(id);
   }

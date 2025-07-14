@@ -6,9 +6,7 @@ import { RestaurantController } from './restaurant.controller';
 import { RestaurantService } from './restaurant.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Restaurant]),
-  ],
+  imports: [TypeOrmModule.forFeature([Restaurant])],
   controllers: [RestaurantController],
   providers: [RestaurantService, RestaurantRepository],
   exports: [RestaurantService, RestaurantRepository],

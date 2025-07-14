@@ -5,7 +5,6 @@ import { Restaurant } from '../entities/restaurant.entity';
 import { CreateRestaurantDto } from '../dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from '../dto/update-restaurant.dto';
 
-
 @Injectable()
 export class RestaurantRepository {
   constructor(
@@ -45,16 +44,30 @@ export class RestaurantRepository {
     });
   }
 
-  async findByLocation(latitude: number, longitude: number, radius: number = 1): Promise<Restaurant[]> {
-    const query = this.restaurantRepository.createQueryBuilder('restaurant')
-      .where('ABS(restaurant.latitude - :latitude) < :radius', { latitude, radius })
-      .andWhere('ABS(restaurant.longitude - :longitude) < :radius', { longitude, radius })
+  async findByLocation(
+    latitude: number,
+    longitude: number,
+    radius: number = 1,
+  ): Promise<Restaurant[]> {
+    const query = this.restaurantRepository
+      .createQueryBuilder('restaurant')
+      .where('ABS(restaurant.latitude - :latitude) < :radius', {
+        latitude,
+        radius,
+      })
+      .andWhere('ABS(restaurant.longitude - :longitude) < :radius', {
+        longitude,
+        radius,
+      })
       .leftJoinAndSelect('restaurant.dishes', 'dishes');
-    
+
     return await query.getMany();
   }
 
-  async update(id: number, updateRestaurantDto: UpdateRestaurantDto): Promise<Restaurant | null> {
+  async update(
+    id: number,
+    updateRestaurantDto: UpdateRestaurantDto,
+  ): Promise<Restaurant | null> {
     await this.restaurantRepository.update(id, updateRestaurantDto);
     return await this.findById(id);
   }

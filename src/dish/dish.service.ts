@@ -1,11 +1,14 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { DishRepository } from './repositories/dish.repository';
 import { RestaurantRepository } from 'src/restaurant/repositories/restaurant.repository';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { DishResponseDto } from './dto/response-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { Dish } from './entities/dish.entity';
-
 
 @Injectable()
 export class DishService {
@@ -15,9 +18,13 @@ export class DishService {
   ) {}
 
   async create(createDishDto: CreateDishDto): Promise<DishResponseDto> {
-    const restaurantExists = await this.restaurantRepository.exists(createDishDto.restaurantId);
+    const restaurantExists = await this.restaurantRepository.exists(
+      createDishDto.restaurantId,
+    );
     if (!restaurantExists) {
-      throw new BadRequestException(`Restaurant with ID ${createDishDto.restaurantId} does not exist`);
+      throw new BadRequestException(
+        `Restaurant with ID ${createDishDto.restaurantId} does not exist`,
+      );
     }
 
     const dish = await this.dishRepository.create(createDishDto);
@@ -26,7 +33,7 @@ export class DishService {
 
   async findAll(): Promise<DishResponseDto[]> {
     const dishes = await this.dishRepository.findAll();
-    return dishes.map(dish => this.toResponseDto(dish));
+    return dishes.map((dish) => this.toResponseDto(dish));
   }
 
   async findById(id: number): Promise<DishResponseDto> {
@@ -38,27 +45,36 @@ export class DishService {
   }
 
   async findByRestaurantId(restaurantId: number): Promise<DishResponseDto[]> {
-    const restaurantExists = await this.restaurantRepository.exists(restaurantId);
+    const restaurantExists =
+      await this.restaurantRepository.exists(restaurantId);
     if (!restaurantExists) {
-      throw new BadRequestException(`Restaurant with ID ${restaurantId} does not exist`);
+      throw new BadRequestException(
+        `Restaurant with ID ${restaurantId} does not exist`,
+      );
     }
 
     const dishes = await this.dishRepository.findByRestaurantId(restaurantId);
-    return dishes.map(dish => this.toResponseDto(dish));
+    return dishes.map((dish) => this.toResponseDto(dish));
   }
 
   async findByName(name: string): Promise<DishResponseDto[]> {
     const dishes = await this.dishRepository.findByName(name);
-    return dishes.map(dish => this.toResponseDto(dish));
+    return dishes.map((dish) => this.toResponseDto(dish));
   }
 
-  async findByPriceRange(minPrice: number, maxPrice: number): Promise<DishResponseDto[]> {
+  async findByPriceRange(
+    minPrice: number,
+    maxPrice: number,
+  ): Promise<DishResponseDto[]> {
     if (minPrice < 0 || maxPrice < 0 || minPrice > maxPrice) {
       throw new BadRequestException('Invalid price range');
     }
 
-    const dishes = await this.dishRepository.findByPriceRange(minPrice, maxPrice);
-    return dishes.map(dish => this.toResponseDto(dish));
+    const dishes = await this.dishRepository.findByPriceRange(
+      minPrice,
+      maxPrice,
+    );
+    return dishes.map((dish) => this.toResponseDto(dish));
   }
 
   async findByTags(tags: string[]): Promise<DishResponseDto[]> {
@@ -67,7 +83,7 @@ export class DishService {
     }
 
     const dishes = await this.dishRepository.findByTags(tags);
-    return dishes.map(dish => this.toResponseDto(dish));
+    return dishes.map((dish) => this.toResponseDto(dish));
   }
 
   async findByAllergens(allergens: string[]): Promise<DishResponseDto[]> {
@@ -76,10 +92,13 @@ export class DishService {
     }
 
     const dishes = await this.dishRepository.findByAllergens(allergens);
-    return dishes.map(dish => this.toResponseDto(dish));
+    return dishes.map((dish) => this.toResponseDto(dish));
   }
 
-  async update(id: number, updateDishDto: UpdateDishDto): Promise<DishResponseDto> {
+  async update(
+    id: number,
+    updateDishDto: UpdateDishDto,
+  ): Promise<DishResponseDto> {
     const dish = await this.dishRepository.findById(id);
     if (!dish) {
       throw new NotFoundException(`Dish with ID ${id} not found`);
@@ -98,9 +117,12 @@ export class DishService {
   }
 
   async deleteByRestaurantId(restaurantId: number): Promise<void> {
-    const restaurantExists = await this.restaurantRepository.exists(restaurantId);
+    const restaurantExists =
+      await this.restaurantRepository.exists(restaurantId);
     if (!restaurantExists) {
-      throw new BadRequestException(`Restaurant with ID ${restaurantId} does not exist`);
+      throw new BadRequestException(
+        `Restaurant with ID ${restaurantId} does not exist`,
+      );
     }
     await this.dishRepository.deleteByRestaurantId(restaurantId);
   }

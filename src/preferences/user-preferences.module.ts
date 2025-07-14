@@ -7,10 +7,7 @@ import { UserPreferencesRepository } from './repositories/user-preferences.repos
 import { UserPreferencesController } from './user-preferences.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([UserPreferences]),
-    UsersModule,
-  ],
+  imports: [TypeOrmModule.forFeature([UserPreferences]), UsersModule],
   controllers: [UserPreferencesController],
   providers: [UserPreferencesService, UserPreferencesRepository],
   exports: [UserPreferencesService, UserPreferencesRepository],

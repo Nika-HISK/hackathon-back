@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsString, IsNumber, IsArray, IsOptional, IsUrl, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsArray,
+  IsOptional,
+  IsUrl,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateDishDto {

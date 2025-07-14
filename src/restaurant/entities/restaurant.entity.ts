@@ -1,8 +1,14 @@
 import { Dish } from 'src/dish/entities/dish.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  BaseEntity,
+} from 'typeorm';
 
 @Entity('restaurants')
-export class Restaurant {
+export class Restaurant extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

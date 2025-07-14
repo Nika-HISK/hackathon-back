@@ -7,10 +7,7 @@ import { DishService } from './dish.service';
 import { DishController } from './dish.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Dish]),
-    RestaurantModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Dish]), RestaurantModule],
   controllers: [DishController],
   providers: [DishService, DishRepository],
   exports: [DishService, DishRepository],
