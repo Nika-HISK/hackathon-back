@@ -27,6 +27,7 @@ import { Dish } from './dish/entities/dish.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
+        ssl:true,
         entities: [User,UserPreferences,Restaurant,Dish],
         synchronize: configService.get('NODE_ENV') !== 'production',
       }),
