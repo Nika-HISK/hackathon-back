@@ -26,7 +26,7 @@ export class Dish extends BaseEntity {
   price: number;
 
   @Column({ name: 'image_url', type: 'text', nullable: false })
-  imageUrl: string;
+  image_url: string;
 
   @Column({ type: 'json', nullable: false })
   ingredients: string[];
