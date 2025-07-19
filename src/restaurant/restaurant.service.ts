@@ -4,6 +4,7 @@ import { RestaurantResponseDto } from './dto/response-restaurant.dto';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { Restaurant } from './entities/restaurant.entity';
+import { DishResponseDto } from '../dish/dto/response-dish.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -82,7 +83,7 @@ export class RestaurantService {
   }
 
   private toResponseDto(restaurant: Restaurant): RestaurantResponseDto {
-    return {
+    const response: RestaurantResponseDto = {
       id: restaurant.id,
       name: restaurant.name,
       address: restaurant.address,
@@ -93,5 +94,22 @@ export class RestaurantService {
       priceRange: restaurant.priceRange,
       atmosphere: restaurant.atmosphere,
     };
+
+    // Include dishes if they exist
+    if (restaurant.dishes && restaurant.dishes.length > 0) {
+      response.dishes = restaurant.dishes.map(dish => ({
+        id: dish.id,
+        restaurantId: dish.restaurantId,
+        name: dish.name,
+        description: dish.description,
+        price: dish.price,
+        imageUrl: dish.imageUrl,
+        ingredients: dish.ingredients,
+        tags: dish.tags,
+        allergens: dish.allergens,
+      }));
+    }
+
+    return response;
   }
 }

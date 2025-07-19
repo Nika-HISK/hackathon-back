@@ -1,3 +1,5 @@
+import { DishResponseDto } from '../../dish/dto/response-dish.dto';
+
 export class RestaurantResponseDto {
   id: number;
   name: string;
@@ -8,4 +10,5 @@ export class RestaurantResponseDto {
   phone: string;
   priceRange: number;
   atmosphere: string[];
+  dishes?: DishResponseDto[];
 }
