@@ -44,7 +44,7 @@ export class CreateDishDto {
   @IsString({ each: true })
   tags: string[];
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   allergens: string[];
