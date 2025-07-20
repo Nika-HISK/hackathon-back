@@ -13,6 +13,7 @@ import {
   HttpCode,
   UploadedFile,
   UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import { RestaurantService } from './restaurant.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
@@ -21,11 +22,11 @@ import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { plainToInstance } from 'class-transformer';
 import SupraSearchEngine from './SupraMultiSearchEngine';
 import { AiRestaurantSearchDto } from './dto/AiRestaurantSearchDto';
+import path from 'path';
+import { ImageSearchDto } from './dto/imageSearch.Dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import path, { extname } from 'path';
-import axios from 'axios';
 import * as fs from 'fs';
+
 
 @Controller('restaurants')
 export class RestaurantController {
@@ -98,6 +99,9 @@ export class RestaurantController {
 
     return plainToInstance(RestaurantResponseDto, matchedRestaurants);
   }
+
+
+  
 
   
   @Get('search/name')
