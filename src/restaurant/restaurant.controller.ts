@@ -48,14 +48,16 @@ export class RestaurantController {
 
   @Post('search-ai')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('image'))
   async aiSearch(
-    @Body() body: AiRestaurantSearchDto,
+    @Body() body: AiRestaurantSearchDto | ImageSearchDto,
+    @UploadedFile() file?: Express.Multer.File,
   ): Promise<RestaurantResponseDto[]> {
     const engine = new SupraSearchEngine();
-
+    
     // Load restaurant + dish data
     const restaurants = await this.restaurantService.findAll(); // includes dishes
-
+    
     // Convert entities into raw JSON format (to send to AI)
     const dishList = restaurants.flatMap((r) =>
       r.dishes.map((d) => ({
@@ -65,114 +67,64 @@ export class RestaurantController {
         dish_price: d.price,
       })),
     );
-
+    
     // Inject data into AI engine
     engine['restaurantData'] = dishList; // hacky but effective since loadData reads from JSON
-
-    const aiResponse = await engine.search(body.text);
-
-    if (aiResponse.status !== 'success' || !aiResponse.data) {
-      return [];
-    }
-
-    // Map AI result (dish info) back to full restaurant info
-    const matchedRestaurantIds = new Set(
-      aiResponse.data.results.map((r) => parseInt(r.restaurant_id)),
-    );
-
-    const matchedDishes = new Set(
-      aiResponse.data.results.map((r) => `${r.restaurant_id}-${r.dish_name}`),
-    );
-
-    const matchedRestaurants = restaurants
-      .filter((r) => matchedRestaurantIds.has(r.id))
-      .map((r) => {
-        const filteredDishes = r.dishes.filter((d) =>
-          matchedDishes.has(`${r.id}-${d.name}`),
-        );
-
-        return {
-          ...r,
-          dishes: filteredDishes,
-        };
-      });
-
-    return plainToInstance(RestaurantResponseDto, matchedRestaurants);
-  }
-
-  @Post('search-ai/image')
-  @HttpCode(HttpStatus.OK)
-  @UseInterceptors(FileInterceptor('image'))
-  async aiImageSearch(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: ImageSearchDto,
-  ): Promise<RestaurantResponseDto[]> {
-    if (!file) {
-      throw new BadRequestException('Image file is required');
-    }
-
-    const engine = new SupraSearchEngine();
-
-    // Load restaurant + dish data
-    const restaurants = await this.restaurantService.findAll();
-    const dishList = restaurants.flatMap((r) =>
-      r.dishes.map((d) => ({
-        restaurant_id: r.id.toString(),
-        restaurant_name: r.name,
-        dish_name: d.name,
-        dish_price: d.price,
-      })),
-    );
-
-    engine['restaurantData'] = dishList;
-
-    // Save uploaded file temporarily
-    const tempPath = `temp_${Date.now()}_${file.originalname}`;
-    fs.writeFileSync(tempPath, file.buffer);
-
+    
+    let aiResponse;
+    let tempPath: string | undefined;
+    
     try {
-      const aiResponse = await engine.search(
-        body.text || '',
-        tempPath,
-        body.preferences || '',
-        body.limit || 10
-      );
-
+      if (file) {
+        // Image search path
+        tempPath = `temp_${Date.now()}_${file.originalname}`;
+        fs.writeFileSync(tempPath, file.buffer);
+        
+        const imageBody = body as ImageSearchDto;
+        aiResponse = await engine.search(
+          imageBody.text || '',
+          tempPath,
+          imageBody.preferences || '',
+          imageBody.limit || 10
+        );
+      } else {
+        // Text search path
+        const textBody = body as AiRestaurantSearchDto;
+        aiResponse = await engine.search(textBody.text);
+      }
+      
       if (aiResponse.status !== 'success' || !aiResponse.data) {
         return [];
       }
-
+      
       // Map AI result (dish info) back to full restaurant info
       const matchedRestaurantIds = new Set(
         aiResponse.data.results.map((r) => parseInt(r.restaurant_id)),
       );
-
       const matchedDishes = new Set(
         aiResponse.data.results.map((r) => `${r.restaurant_id}-${r.dish_name}`),
       );
-
+      
       const matchedRestaurants = restaurants
         .filter((r) => matchedRestaurantIds.has(r.id))
         .map((r) => {
           const filteredDishes = r.dishes.filter((d) =>
             matchedDishes.has(`${r.id}-${d.name}`),
           );
-
           return {
             ...r,
             dishes: filteredDishes,
           };
         });
-
+      
       return plainToInstance(RestaurantResponseDto, matchedRestaurants);
     } finally {
-      // Clean up temp file
-      if (fs.existsSync(tempPath)) {
+      // Clean up temp file if it exists
+      if (tempPath && fs.existsSync(tempPath)) {
         fs.unlinkSync(tempPath);
       }
     }
   }
-
 
   
 
