@@ -72,13 +72,41 @@ export class SupraSearchEngine {
   }
 
   /**
-   * Helper to prepare an image file for the API
+   * Enhanced image processing with better error handling and validation
+   * Extracted and improved from Python multi-search version
    */
   private processImage(imagePath: string): { inlineData: { data: string; mimeType: string } } {
     try {
-      const imageBuffer = fs.readFileSync(imagePath);
+      // Resolve absolute path to handle relative paths correctly
+      const resolvedPath = path.resolve(imagePath);
+      
+      // Validate file exists
+      if (!fs.existsSync(resolvedPath)) {
+        throw new Error(`Image file not found: ${imagePath}`);
+      }
+
+      // Check file size (max 20MB for Google AI API)
+      const stats = fs.statSync(resolvedPath);
+      const maxSize = 20 * 1024 * 1024; // 20MB
+      if (stats.size > maxSize) {
+        throw new Error(`Image file too large: ${(stats.size / 1024 / 1024).toFixed(2)}MB. Max size: 20MB`);
+      }
+
+      // Read image file as buffer (equivalent to Python's binary read)
+      const imageBuffer = fs.readFileSync(resolvedPath);
+      
+      // Convert to base64 string for Google AI API
       const base64Data = imageBuffer.toString('base64');
-      const mimeType = SupraSearchEngine.getMimeType(imagePath);
+      
+      // Get proper MIME type
+      const mimeType = this.getMimeType(resolvedPath);
+      
+      // Validate it's actually an image MIME type
+      if (!mimeType.startsWith('image/')) {
+        throw new Error(`Invalid image format. Detected MIME type: ${mimeType}`);
+      }
+
+      console.log(`🖼️ Image processed: ${path.basename(imagePath)} (${(stats.size / 1024).toFixed(2)}KB, ${mimeType})`);
       
       return {
         inlineData: {
@@ -87,32 +115,70 @@ export class SupraSearchEngine {
         }
       };
     } catch (error) {
-      throw new Error(`Failed to process image: ${error}`);
+      throw new Error(`Failed to process image "${imagePath}": ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
   /**
-   * Get MIME type based on file extension
+   * Enhanced MIME type detection with more formats and validation
    */
-  static getMimeType(filePath: string): string {
+  private getMimeType(filePath: string): string {
     const ext = path.extname(filePath).toLowerCase();
-    switch (ext) {
-      case '.jpg':
-      case '.jpeg':
-        return 'image/jpeg';
-      case '.png':
-        return 'image/png';
-      case '.gif':
-        return 'image/gif';
-      case '.webp':
-        return 'image/webp';
-      case '.bmp':
-        return 'image/bmp';
-      case '.tiff':
-      case '.tif':
-        return 'image/tiff';
-      default:
-        return 'image/jpeg'; // Default fallback
+    
+    // Supported image formats for Google AI API
+    const mimeTypes: { [key: string]: string } = {
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg', 
+      '.png': 'image/png',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.bmp': 'image/bmp',
+      '.tiff': 'image/tiff',
+      '.tif': 'image/tiff',
+      '.svg': 'image/svg+xml',
+      '.ico': 'image/x-icon',
+      '.heic': 'image/heic',
+      '.heif': 'image/heif'
+    };
+
+    const detectedType = mimeTypes[ext];
+    if (!detectedType) {
+      console.warn(`⚠️ Unknown image extension: ${ext}. Using default: image/jpeg`);
+      return 'image/jpeg'; // Fallback
+    }
+
+    return detectedType;
+  }
+
+  /**
+   * Utility method to validate if file is a supported image format
+   */
+  private isValidImageFile(filePath: string): boolean {
+    const supportedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff', '.tif'];
+    const ext = path.extname(filePath).toLowerCase();
+    return supportedExtensions.includes(ext);
+  }
+
+  /**
+   * Enhanced image processing with pre-validation
+   */
+  private processImageSafely(imagePath: string): { inlineData: { data: string; mimeType: string } } | null {
+    try {
+      // Pre-validate before processing
+      if (!imagePath || imagePath.trim() === '') {
+        console.warn('⚠️ Empty image path provided');
+        return null;
+      }
+
+      if (!this.isValidImageFile(imagePath)) {
+        console.warn(`⚠️ Unsupported image format: ${path.extname(imagePath)}`);
+        return null;
+      }
+
+      return this.processImage(imagePath);
+    } catch (error) {
+      console.error(`❌ Image processing failed: ${error instanceof Error ? error.message : String(error)}`);
+      return null;
     }
   }
 
@@ -129,16 +195,29 @@ export class SupraSearchEngine {
       const restaurantDataJson = JSON.stringify(this.restaurantData, null, 2);
       const contents: any[] = [];
 
-      // Build the prompt
+      // Build the prompt with enhanced image handling
       let prompt = '';
       if (imagePath) {
-        const imageData = this.processImage(imagePath);
-        contents.push(imageData);
-        prompt = `
-        Analyze this food image and find similar dishes in the restaurant database.
+        const imageData = this.processImageSafely(imagePath);
+        if (imageData) {
+          contents.push(imageData);
+          prompt = `
+        🖼️ IMAGE ANALYSIS MODE:
+        - Analyze this food image to identify what dish/cuisine it shows
+        - Search the restaurant database for ACTUAL similar dishes  
+        - Return matching dishes from the database, not just description
+        - Focus on finding real dishes that match what you see in the image
+        
         Additional user query: "${query || 'None'}"
         Return up to ${limit} matches.
         `;
+        } else {
+          console.warn('⚠️ Image processing failed, continuing with text-only search');
+          prompt = `
+        You are a Georgian cuisine expert. Find dishes matching the query: "${query}"
+        Return up to ${limit} matches.
+        `;
+        }
       } else {
         prompt = `
         You are a Georgian cuisine expert. Find dishes matching the query: "${query}"
@@ -160,11 +239,11 @@ export class SupraSearchEngine {
 
       INSTRUCTIONS - Handle ALL operations naturally:
       
-      {"🖼️ IMAGE ANALYSIS MODE:" if image_path else ""}
-      {"- First, analyze the food image to identify what dish/cuisine it shows" if image_path else ""}
-      {"- Then, search the restaurant database for ACTUAL similar dishes" if image_path else ""}
-      {"- Return matching dishes from the database, not just description" if image_path else ""}
-      {"- Focus on finding real dishes that match what you see in the image" if image_path else ""}
+      ${imagePath ? `🖼️ IMAGE ANALYSIS MODE:
+      - First, analyze the food image to identify what dish/cuisine it shows
+      - Then, search the restaurant database for ACTUAL similar dishes
+      - Return matching dishes from the database, not just description
+      - Focus on finding real dishes that match what you see in the image` : ''}
       
       1. UNDERSTAND the user's intent:
          - Adding dishes? ("add", "also", "more", "suggest")
@@ -302,16 +381,29 @@ export class SupraSearchEngine {
     const restaurantDataJson = JSON.stringify(this.restaurantData, null, 2);
     const contents: any[] = [];
 
-    // Build the prompt (same as above)
+    // Build the prompt with enhanced image handling
     let prompt = '';
     if (imagePath) {
-      const imageData = this.processImage(imagePath);
-      contents.push(imageData);
-      prompt = `
-      Analyze this food image and find similar dishes in the restaurant database.
+      const imageData = this.processImageSafely(imagePath);
+      if (imageData) {
+        contents.push(imageData);
+        prompt = `
+      🖼️ IMAGE ANALYSIS MODE:
+      - Analyze this food image to identify what dish/cuisine it shows
+      - Search the restaurant database for ACTUAL similar dishes
+      - Return matching dishes from the database, not just description  
+      - Focus on finding real dishes that match what you see in the image
+      
       Additional user query: "${query || 'None'}"
       Return up to ${limit} matches.
       `;
+      } else {
+        console.warn('⚠️ Image processing failed, continuing with text-only streaming search');
+        prompt = `
+      You are a Georgian cuisine expert. Find dishes matching the query: "${query}"
+      Return up to ${limit} matches.
+      `;
+      }
     } else {
       prompt = `
       You are a Georgian cuisine expert. Find dishes matching the query: "${query}"
