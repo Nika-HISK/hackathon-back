@@ -50,7 +50,7 @@ export class RestaurantController {
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('image'))
   async aiSearch(
-    @Body() body: AiRestaurantSearchDto | ImageSearchDto,
+    @Body() body?: AiRestaurantSearchDto | ImageSearchDto,
     @UploadedFile() file?: Express.Multer.File,
   ): Promise<RestaurantResponseDto[]> {
     const engine = new SupraSearchEngine();
