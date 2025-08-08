@@ -11,13 +11,13 @@
 
 ---
 
-## 🎯 **The Problem We Solve**
+## **The Problem We Solve**
 
 Georgian businesses receive tons of unstructured data daily - handwritten documents, PDFs, images, menus, contracts. This content cannot be searched, analyzed, or used effectively.
 
 Standard search systems fail to understand Georgian context, synonyms, and cultural nuances. Google can't find "spicy food" in Georgian, ChatGPT doesn't know your specific business data.
 
-## 💡 **Our Solution: Two-Agent AI System**
+## **Our Solution: Two-Agent AI System**
 
 ### **Backend Architecture for Georgian AI Intelligence**
 
@@ -36,7 +36,7 @@ This backend powers a **Georgian Language AI Intelligence Platform** with two sp
 
 ---
 
-## 🏗️ **Technical Architecture**
+## **Technical Architecture**
 
 ```
 Frontend Client → NestJS API → PostgreSQL → AI Agents → Intelligent Results
