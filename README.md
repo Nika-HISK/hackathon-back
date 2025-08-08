@@ -1,4 +1,4 @@
-# 🚀 Georgian Language Intelligence Platform - Backend API
+# Georgian Language Intelligence Platform - Backend API
 
 **Hackathon Project: Search & AI Track** | **July 2025**
 
@@ -58,7 +58,7 @@ User Query → S.U.P.R.A. Agent → Conversational Search → API Response
 
 ---
 
-## 🚀 **Quick Start**
+## **Quick Start**
 
 ### **Prerequisites**
 - Node.js 18+
@@ -95,7 +95,7 @@ npm run seed
 
 ---
 
-## 🔌 **API Endpoints**
+## **API Endpoints**
 
 ### **Core Health**
 ```http
@@ -145,7 +145,7 @@ DELETE /dishes/:id    # Delete dish
 
 ---
 
-## 🧠 **AI Agent Integration**
+## **AI Agent Integration**
 
 ### **T.A.S.T.E. Agent Integration**
 ```typescript
@@ -173,7 +173,7 @@ const filteredResults = await suprAgent.processQuery(userQuery, dishes);
 
 ---
 
-## 📊 **Database Schema**
+## **Database Schema**
 
 ### **Core Entities**
 
