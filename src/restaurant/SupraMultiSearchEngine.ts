@@ -4,8 +4,6 @@ import { GoogleGenAI } from '@google/genai';
 import { config } from 'dotenv';
 
 
-
-// Load environment variables
 config();
 
 interface Restaurant {
