@@ -53,9 +53,7 @@ export class SupraSearchEngine {
     this.model = model;
   }
 
-  /**
-   * Loads restaurant data from a JSON file
-   */
+
   loadData(dataPath: string = 'data/rests.json'): boolean {
     try {
       const fullPath = path.resolve(dataPath);
@@ -67,21 +65,16 @@ export class SupraSearchEngine {
     }
   }
 
-  /**
-   * Enhanced image processing with better error handling and validation
-   * Extracted and improved from Python multi-search version
-   */
   private processImage(imagePath: string): { inlineData: { data: string; mimeType: string } } {
     try {
-      // Resolve absolute path to handle relative paths correctly
+
       const resolvedPath = path.resolve(imagePath);
       
-      // Validate file exists
+
       if (!fs.existsSync(resolvedPath)) {
         throw new Error(`Image file not found: ${imagePath}`);
       }
 
-      // Check file size (max 20MB for Google AI API)
       const stats = fs.statSync(resolvedPath);
       const maxSize = 20 * 1024 * 1024; // 20MB
       if (stats.size > maxSize) {
