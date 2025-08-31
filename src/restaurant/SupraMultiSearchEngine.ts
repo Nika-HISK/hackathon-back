@@ -76,21 +76,20 @@ export class SupraSearchEngine {
       }
 
       const stats = fs.statSync(resolvedPath);
-      const maxSize = 20 * 1024 * 1024; // 20MB
+      const maxSize = 20 * 1024 * 1024;
       if (stats.size > maxSize) {
         throw new Error(`Image file too large: ${(stats.size / 1024 / 1024).toFixed(2)}MB. Max size: 20MB`);
       }
 
-      // Read image file as buffer (equivalent to Python's binary read)
       const imageBuffer = fs.readFileSync(resolvedPath);
       
-      // Convert to base64 string for Google AI API
+
       const base64Data = imageBuffer.toString('base64');
       
-      // Get proper MIME type
+
       const mimeType = this.getMimeType(resolvedPath);
       
-      // Validate it's actually an image MIME type
+
       if (!mimeType.startsWith('image/')) {
         throw new Error(`Invalid image format. Detected MIME type: ${mimeType}`);
       }
@@ -107,9 +106,7 @@ export class SupraSearchEngine {
     }
   }
 
-  /**
-   * Enhanced MIME type detection with more formats and validation
-   */
+
   private getMimeType(filePath: string): string {
     const ext = path.extname(filePath).toLowerCase();
     
