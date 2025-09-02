@@ -127,7 +127,7 @@ export class SupraSearchEngine {
 
     const detectedType = mimeTypes[ext];
     if (!detectedType) {
-      console.warn(`⚠️ Unknown image extension: ${ext}. Using default: image/jpeg`);
+      console.warn(`Unknown image extension: ${ext}. Using default: image/jpeg`);
       return 'image/jpeg';
     }
 
@@ -145,7 +145,7 @@ export class SupraSearchEngine {
     try {
       // Pre-validate before processing
       if (!imagePath || imagePath.trim() === '') {
-        console.warn('⚠️ Empty image path provided');
+        console.warn('Empty image path provided');
         return null;
       }
 
@@ -156,7 +156,7 @@ export class SupraSearchEngine {
 
       return this.processImage(imagePath);
     } catch (error) {
-      console.error(`❌ Image processing failed: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`Image processing failed: ${error instanceof Error ? error.message : String(error)}`);
       return null;
     }
   }
@@ -178,7 +178,7 @@ export class SupraSearchEngine {
         if (imageData) {
           contents.push(imageData);
           prompt = `
-        🖼️ IMAGE ANALYSIS MODE:
+         IMAGE ANALYSIS MODE:
         - Analyze this food image to identify what dish/cuisine it shows
         - Search the restaurant database for ACTUAL similar dishes  
         - Return matching dishes from the database, not just description
@@ -188,7 +188,7 @@ export class SupraSearchEngine {
         Return up to ${limit} matches.
         `;
         } else {
-          console.warn('⚠️ Image processing failed, continuing with text-only search');
+          console.warn('Image processing failed, continuing with text-only search');
           prompt = `
         You are a Georgian cuisine expert. Find dishes matching the query: "${query}"
         Return up to ${limit} matches.
@@ -215,7 +215,7 @@ export class SupraSearchEngine {
 
       INSTRUCTIONS - Handle ALL operations naturally:
       
-      ${imagePath ? `🖼️ IMAGE ANALYSIS MODE:
+      ${imagePath ? `IMAGE ANALYSIS MODE:
       - First, analyze the food image to identify what dish/cuisine it shows
       - Then, search the restaurant database for ACTUAL similar dishes
       - Return matching dishes from the database, not just description
@@ -345,9 +345,7 @@ export class SupraSearchEngine {
     }
   }
 
-  /**
-   * Streaming version of search for real-time results
-   */
+
   async searchStream(
     query: string = '',
     imagePath: string = '',
@@ -357,14 +355,13 @@ export class SupraSearchEngine {
     const restaurantDataJson = JSON.stringify(this.restaurantData, null, 2);
     const contents: any[] = [];
 
-    // Build the prompt with enhanced image handling
     let prompt = '';
     if (imagePath) {
       const imageData = this.processImageSafely(imagePath);
       if (imageData) {
         contents.push(imageData);
         prompt = `
-      🖼️ IMAGE ANALYSIS MODE:
+       IMAGE ANALYSIS MODE:
       - Analyze this food image to identify what dish/cuisine it shows
       - Search the restaurant database for ACTUAL similar dishes
       - Return matching dishes from the database, not just description  
