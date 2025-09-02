@@ -110,7 +110,6 @@ export class SupraSearchEngine {
   private getMimeType(filePath: string): string {
     const ext = path.extname(filePath).toLowerCase();
     
-    // Supported image formats for Google AI API
     const mimeTypes: { [key: string]: string } = {
       '.jpg': 'image/jpeg',
       '.jpeg': 'image/jpeg', 
@@ -129,24 +128,19 @@ export class SupraSearchEngine {
     const detectedType = mimeTypes[ext];
     if (!detectedType) {
       console.warn(`⚠️ Unknown image extension: ${ext}. Using default: image/jpeg`);
-      return 'image/jpeg'; // Fallback
+      return 'image/jpeg';
     }
 
     return detectedType;
   }
 
-  /**
-   * Utility method to validate if file is a supported image format
-   */
+
   private isValidImageFile(filePath: string): boolean {
     const supportedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff', '.tif'];
     const ext = path.extname(filePath).toLowerCase();
     return supportedExtensions.includes(ext);
   }
 
-  /**
-   * Enhanced image processing with pre-validation
-   */
   private processImageSafely(imagePath: string): { inlineData: { data: string; mimeType: string } } | null {
     try {
       // Pre-validate before processing
@@ -167,9 +161,7 @@ export class SupraSearchEngine {
     }
   }
 
-  /**
-   * Performs a multimodal search using either text, an image, or both
-   */
+
   async search(
     query: string = '',
     imagePath: string = '',
@@ -180,7 +172,6 @@ export class SupraSearchEngine {
       const restaurantDataJson = JSON.stringify(this.restaurantData, null, 2);
       const contents: any[] = [];
 
-      // Build the prompt with enhanced image handling
       let prompt = '';
       if (imagePath) {
         const imageData = this.processImageSafely(imagePath);
